@@ -1,0 +1,36 @@
+plugins { id 'com.android.application' }
+
+// 서명 정보는 local.properties (git 에 올리지 않음)
+def localProps = new Properties()
+def lp = rootProject.file('local.properties')
+if (lp.exists()) lp.withInputStream { localProps.load(it) }
+
+android {
+    namespace 'com.grara.policeescape'
+    compileSdk 34
+    defaultConfig {
+        applicationId 'com.grara.policeescape'
+        minSdk 30
+        targetSdk 34
+        versionCode 2
+        versionName '1.1'
+    }
+    signingConfigs {
+        release {
+            storeFile file(localProps.getProperty('release.storeFile', 'missing.jks'))
+            storePassword localProps.getProperty('release.storePassword', '')
+            keyAlias localProps.getProperty('release.keyAlias', '')
+            keyPassword localProps.getProperty('release.keyPassword', '')
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
