@@ -24,7 +24,7 @@ public class SoundFx {
     private final SoundPool pool;
     private final Random rnd = new Random(7);
     private boolean bt;
-    private int sCoin, sCrash, sSwoosh, sLevel, sSiren, sCaught, sStart;
+    private int sCoin, sCrash, sSwoosh, sLevel, sSiren, sCaught, sStart, sPower, sDeny, sClick, sRevive, sBuy;
     private int sirenStream;
     private boolean released;
 
@@ -59,6 +59,11 @@ public class SoundFx {
         sSiren = load(dir, "siren", siren());
         sCaught = load(dir, "caught", caught());
         sStart = load(dir, "start", start());
+        sPower = load(dir, "power", powerUp());
+        sDeny = load(dir, "deny", deny());
+        sClick = load(dir, "click", click());
+        sRevive = load(dir, "revive", revive());
+        sBuy = load(dir, "buy", buy());
         bt = checkBt();
         am.registerAudioDeviceCallback(cb, new Handler(Looper.getMainLooper()));
     }
@@ -92,6 +97,12 @@ public class SoundFx {
     public void levelFx() { play(sLevel, 0.7f, 1f); }
     public void caughtFx() { play(sCaught, 1f, 1f); }
     public void startFx() { play(sStart, 0.7f, 1f); }
+    public void powerFx() { play(sPower, 0.7f, 1f); }
+    public void denyFx() { play(sDeny, 0.6f, 1f); }
+    public void clickFx() { play(sClick, 0.4f, 1f); }
+    public void reviveFx() { play(sRevive, 0.8f, 1f); }
+    public void buyFx() { play(sBuy, 0.7f, 1f); }
+    public void smashFx() { play(sCrash, 0.55f, 1.3f + rnd.nextFloat() * 0.2f); }
 
     /** 사이렌 볼륨 (0 이면 정지). 경찰이 가까울수록 크게. */
     public void siren(float vol) {
@@ -271,6 +282,48 @@ public class SoundFx {
         float[] o = new float[(int) (SR * 0.35)];
         tone(o, 0, 0.1, 660, 660, 0.4f, true);
         tone(o, 0.13, 0.2, 990, 990, 0.4f, true);
+        return toPcm(o);
+    }
+
+    /** 파워업 획득: 반짝이는 상승 아르페지오. */
+    private short[] powerUp() {
+        float[] o = new float[(int) (SR * 0.5)];
+        double[] notes = {784, 988, 1175, 1568, 1976};
+        for (int i = 0; i < notes.length; i++) tone(o, i * 0.05, 0.25, notes[i], notes[i] * 1.01, 0.3f, false);
+        return toPcm(o);
+    }
+
+    /** 코인 부족 등 거절음. */
+    private short[] deny() {
+        float[] o = new float[(int) (SR * 0.3)];
+        tone(o, 0, 0.12, 220, 210, 0.45f, true);
+        tone(o, 0.13, 0.15, 180, 170, 0.45f, true);
+        return toPcm(o);
+    }
+
+    /** 메뉴 이동 틱. */
+    private short[] click() {
+        float[] o = new float[(int) (SR * 0.04)];
+        tone(o, 0, 0.035, 1800, 1500, 0.35f, false);
+        return toPcm(o);
+    }
+
+    /** 부활: 낮은 음에서 높은 화음으로. */
+    private short[] revive() {
+        float[] o = new float[(int) (SR * 0.8)];
+        tone(o, 0, 0.5, 300, 900, 0.35f, true);
+        tone(o, 0.35, 0.4, 1047, 1047, 0.3f, false);
+        tone(o, 0.35, 0.4, 1319, 1319, 0.25f, false);
+        tone(o, 0.35, 0.4, 1568, 1568, 0.2f, false);
+        return toPcm(o);
+    }
+
+    /** 구매 완료: 계산대 딩동. */
+    private short[] buy() {
+        float[] o = new float[(int) (SR * 0.4)];
+        tone(o, 0, 0.08, 1319, 1319, 0.4f, true);
+        tone(o, 0.07, 0.08, 1568, 1568, 0.4f, true);
+        tone(o, 0.14, 0.25, 2093, 2093, 0.35f, true);
         return toPcm(o);
     }
 }
