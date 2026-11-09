@@ -15,6 +15,7 @@ public class MainActivity extends Activity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         game = new GameView(this);
         game.updater = new Updater(this);
+        game.sfx = new SoundFx(this);
         setContentView(game);
         game.requestFocus();
     }
@@ -40,6 +41,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         game.pause();
+        if (game.sfx != null) game.sfx.stopSiren();
         super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (game.sfx != null) game.sfx.release();
+        super.onDestroy();
     }
 }
