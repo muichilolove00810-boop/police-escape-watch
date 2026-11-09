@@ -145,6 +145,11 @@ public class GameView extends View {
         prefs = ctx.getSharedPreferences("game", Context.MODE_PRIVATE);
         best = prefs.getInt("best", 0);
         totalCoins = prefs.getInt("coins", 0);
+        // 테스트 중 실수로 사용된 코인 340개를 1회 환불 (구매한 아이템은 유지)
+        if (!prefs.getBoolean("refund_v15", false)) {
+            if (prefs.contains("coins")) totalCoins += 340;
+            prefs.edit().putInt("coins", totalCoins).putBoolean("refund_v15", true).apply();
+        }
         for (int i = 0; i < SH_COUNT; i++) if (SH_KEY[i] != null) owned[i] = prefs.getInt(SH_KEY[i], 0);
         text.setTextAlign(Paint.Align.CENTER);
         text.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));

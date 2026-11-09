@@ -4,7 +4,7 @@ param(
     [Parameter(Mandatory = $true)][string]$VersionName,
     [string]$Notes = "업데이트"
 )
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = "Continue"
 Set-Location $PSScriptRoot
 $env:JAVA_HOME = "C:\Program Files\Microsoft\jdk-21.0.12.8-hotspot"
 
