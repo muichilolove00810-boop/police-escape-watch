@@ -110,6 +110,7 @@ public class GameView extends View {
         playerX = laneX(1);
         tilt = 0;
         time = 0;
+        lastLevel = 1;
         score = 0;
         dodged = 0;
         spawnAcc = 0;
@@ -206,7 +207,16 @@ public class GameView extends View {
         float baseSpeed = H * 0.35f;
         if (state == STATE_PLAY) {
             time += dt;
-            speed = H * Math.min(1.7f, 0.55f + time * 0.028f);
+            // 갈수록 계속 빨라진다: 10초마다 레벨업 + 레벨 안에서도 조금씩 가속
+            int lv = level();
+            if (lv > lastLevel) {
+                lastLevel = lv;
+                flashText = 1.3f;
+                buzz(40);
+            }
+            float target = 0.55f + (lv - 1) * 0.16f + (time % 10f) * 0.006f;
+            float want = H * Math.min(3.2f, target);
+            speed += (want - speed) * Math.min(1f, dt * 2.5f); // 부드럽게 가속
         } else if (state == STATE_READY) {
             speed = baseSpeed;
         } else {
@@ -259,8 +269,7 @@ public class GameView extends View {
             if (!c.passed && c.y - carH / 2 > playerY + carH / 2) {
                 c.passed = true;
                 dodged++;
-                score += 10;
-                if (dodged % 25 == 0) flashText = 1.2f;
+                score += 10 * level();
             }
             if (c.y - carH > H) it.remove();
         }
@@ -296,6 +305,12 @@ public class GameView extends View {
         if (vibrator != null) {
             vibrator.vibrate(VibrationEffect.createWaveform(new long[]{0, 120, 60, 200}, -1));
         }
+    }
+
+    private int lastLevel = 1;
+
+    private int level() {
+        return 1 + (int) (time / 10f);
     }
 
     private int totalScore() {
@@ -453,10 +468,13 @@ public class GameView extends View {
             c.drawText(String.valueOf(totalScore()), cx + 2, H * 0.17f + 2, text);
             text.setColor(Color.WHITE);
             c.drawText(String.valueOf(totalScore()), cx, H * 0.17f, text);
+            text.setTextSize(W * 0.05f);
+            text.setColor(Color.rgb(255, 200, 60));
+            c.drawText("Lv " + level(), cx, H * 0.235f, text);
             if (flashText > 0) {
-                text.setTextSize(W * 0.07f);
+                text.setTextSize(W * 0.08f);
                 text.setColor(Color.argb((int) (255 * Math.min(1f, flashText)), 255, 220, 60));
-                c.drawText("속도 UP!", cx, H * 0.4f, text);
+                c.drawText("속도 UP! Lv " + level(), cx, H * 0.4f, text);
             }
             return;
         }

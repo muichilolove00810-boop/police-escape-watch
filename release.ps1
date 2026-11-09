@@ -1,4 +1,4 @@
-# 새 버전 배포: 버전 올리기 -> 릴리스 빌드 -> GitHub Releases 업로드
+﻿# 새 버전 배포: 버전 올리기 -> 릴리스 빌드 -> GitHub Releases 업로드
 # 사용법:  .\release.ps1 1.2 "변경 내용"
 param(
     [Parameter(Mandatory = $true)][string]$VersionName,
